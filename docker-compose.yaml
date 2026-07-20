@@ -1,4 +1,4 @@
-# docker-compose.yml
+version: '3.8'
 
 services:
   db:
@@ -12,6 +12,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-airflow-db.sh:/docker-entrypoint-initdb.d/init-airflow-db.sh
 
   minio:
     image: minio/minio:latest
@@ -21,10 +22,44 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
     ports:
-      - "9000:9000" # S3 API
-      - "9001:9001" # Web Console
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - minio_data:/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: inspection_redis
+    ports:
+      - "6379:6379"
+
+  airflow:
+    image: apache/airflow:2.9.1-python3.11
+    container_name: airflow
+    depends_on:
+      - db
+      - redis
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:password@db:5432/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:password@db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: '46BIJoStY9PdjigIU8SfxjjjAqp6FvLT01-U8gPsqH0='
+      # Prevents Airflow from examples loading which can sometimes cause weird UI issues
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False' 
+    ports:
+      - "8080:8080"
+    # Updated command sequence
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow connections create-default-connections &&
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com || true &&
+      airflow webserver &&
+      airflow scheduler
+      "
+    volumes:
+      - ./dags:/opt/airflow/dags
 
 volumes:
   postgres_data:
