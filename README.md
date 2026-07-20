@@ -1,6 +1,4 @@
-Here is the updated `README.md`, stripped down specifically for **Setup and Installation only**. No application code, no database schemas—just getting the infrastructure, backend environment, and frontend environment up and running.
 
-```markdown
 # Inspection System - Environment Setup
 
 This repository contains the foundational setup for a full-stack computer vision inspection system. The actual application code and database schemas will be implemented later. This guide focuses strictly on setting up the development environment, infrastructure, and dependencies.
