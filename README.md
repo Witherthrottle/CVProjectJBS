@@ -12,8 +12,6 @@ docker-compose up -d
 *Access UIs:*
 * Airflow: `http://localhost:8080` (admin / admin)
 * MinIO: `http://localhost:9001` (admin / password)
-* pgAdmin: `http://localhost:5050` (admin@admin.com / password)
-  * *To connect pgAdmin to the DB, use Host: `db`, Port: `5432`, User: `admin`, Pass: `password`*
 
 ### 3. Setup Backend
 ```bash
