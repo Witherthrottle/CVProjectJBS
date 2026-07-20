@@ -1,6 +1,4 @@
-Here is a lean, copy-paste-ready `README.md` containing **only the exact steps** a developer needs to run to get the project up and running. 
 
-```markdown
 # Project Setup
 
 ### 1. Prerequisites
